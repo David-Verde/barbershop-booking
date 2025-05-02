@@ -71,4 +71,16 @@ export const addService = async (serviceData) => {
   return res.data;
 };
 
+// Cancelar/Eliminar cita
+export const deleteAppointment = async (appointmentId) => {
+    const res = await api.delete(`/admin/appointments/${appointmentId}`);
+    return res.data;
+  };
+  
+  // Eliminar servicio
+  export const deleteService = async (serviceId) => {
+    const res = await api.delete(`/admin/services/${serviceId}`);
+    return res.data;
+  };
+
 export default api;

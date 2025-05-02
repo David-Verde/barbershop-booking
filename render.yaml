@@ -1,0 +1,24 @@
+# render.yaml
+services:
+  - type: web
+    name: barberia-backend
+    runtime: node
+    branch: main
+    env: node
+    buildCommand: npm install
+    startCommand: node server/server.js
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: MONGODB_URI
+        value: mongodb+srv://usuario:password@cluster0.mongodb.net/barbershop?retryWrites=true&w=majority
+      - key: JWT_SECRET
+        generateValue: true
+      - key: TWILIO_ACCOUNT_SID
+        value: ACe168cfa2324946ed087929caf4cda6e4
+      - key: TWILIO_AUTH_TOKEN
+        value: d00186d1d6006689004a7c8ec6e59cc9
+      - key: TWILIO_WHATSAPP_NUMBER
+        value: +14155238886
+      - key: ADMIN_WHATSAPP_NUMBER
+        value: +593960144140

@@ -74,4 +74,28 @@ router.post('/services', auth, async (req, res) => {
   }
 });
 
+
+// Eliminar servicio
+router.delete('/services/:id', auth, async (req, res) => {
+    try {
+      await Service.findByIdAndDelete(req.params.id);
+      res.json({ message: 'Servicio eliminado' });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
+  
+  // Cancelar/Eliminar cita
+  router.delete('/appointments/:id', auth, async (req, res) => {
+    try {
+      const appointment = await Appointment.findByIdAndDelete(req.params.id);
+      
+      // Opcional: Notificar al cliente vía WhatsApp
+      await sendCancellationNotification(appointment);
+      
+      res.json({ message: 'Cita eliminada' });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
 module.exports = router;

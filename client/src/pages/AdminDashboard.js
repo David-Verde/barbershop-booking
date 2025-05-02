@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { FaCalendarAlt, FaSignOutAlt, FaPlus } from 'react-icons/fa';
+import { FaCalendarAlt, FaSignOutAlt, FaPlus, FaTrash } from 'react-icons/fa';
 import { useAppContext } from '../context/AppContext';
-import { getAppointments } from '../utils/api';
+import { getAppointments, deleteAppointment, deleteService } from '../utils/api';
 import Header from '../components/Header';
 import Button from '../components/Button';
 import Loader from '../components/Loader';
@@ -32,6 +32,7 @@ const AppointmentCard = styled.div`
   padding: 20px;
   margin-bottom: 20px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: relative;
 `;
 
 const AppointmentHeader = styled.div`
@@ -83,6 +84,27 @@ const NoAppointments = styled.div`
   color: #666;
 `;
 
+const ActionButton = styled.button`
+  background: ${props => props.danger ? '#e74c3c' : '#3498db'};
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  
+  &:hover {
+    opacity: 0.9;
+  }
+  
+  svg {
+    margin-right: 5px;
+  }
+`;
+
 const AdminDashboard = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -101,7 +123,30 @@ const AdminDashboard = () => {
       setLoading(false);
     }
   };
+
+  const handleDeleteAppointment = async (appointmentId) => {
+    if (window.confirm('¿Estás seguro de cancelar esta cita? Se notificará al cliente.')) {
+      try {
+        await deleteAppointment(appointmentId);
+        // Actualiza el estado local filtrando la cita eliminada
+        setAppointments(prev => prev.filter(app => app._id !== appointmentId));
+      } catch (err) {
+        console.error('Error al cancelar cita:', err);
+      }
+    }
+  };
   
+  const handleDeleteService = async (serviceId) => {
+    if (window.confirm('¿Estás seguro de eliminar este servicio? Esto no afectará citas existentes.')) {
+      try {
+        await deleteService(serviceId);
+      
+        fetchAppointments(); 
+      } catch (err) {
+        console.error('Error al eliminar servicio:', err);
+      }
+    }
+  };
   useEffect(() => {
     fetchAppointments();
   }, []);
@@ -149,10 +194,18 @@ const AdminDashboard = () => {
                 <ClientInfo>
                   {appointment.client.name} ({appointment.client.phone})
                 </ClientInfo>
-                <AppointmentDate>
-                  <FaCalendarAlt />
-                  {formatDate(appointment.date)} a las {appointment.time}
-                </AppointmentDate>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <AppointmentDate>
+                    <FaCalendarAlt />
+                    {formatDate(appointment.date)} a las {appointment.time}
+                  </AppointmentDate>
+                  <ActionButton 
+                    danger 
+                    onClick={() => handleDeleteAppointment(appointment._id)}
+                  >
+                    <FaTrash /> Cancelar
+                  </ActionButton>
+                </div>
               </AppointmentHeader>
               
               <ServicesList>
@@ -178,8 +231,9 @@ const AdminDashboard = () => {
           <AddServiceForm 
             onSuccess={() => {
               setShowAddServiceModal(false);
-              // Aquí podrías actualizar la lista de servicios si es necesario
-            }} 
+              fetchAppointments();
+            }}
+            onDeleteService={handleDeleteService}
           />
         </Modal>
       )}
