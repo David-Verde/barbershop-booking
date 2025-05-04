@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   server:
     build:
@@ -13,6 +11,8 @@ services:
     volumes:
       - ./server:/app
       - /app/node_modules
+    networks:
+      - main
     restart: unless-stopped
 
   client:
@@ -26,4 +26,11 @@ services:
       - /app/node_modules
     depends_on:
       - server
+    networks:
+      - main
     restart: unless-stopped
+
+networks:
+  main:
+    driver: bridge
+    external: true
