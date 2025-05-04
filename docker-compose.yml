@@ -1,6 +1,8 @@
 services:
   server:
     container_name: server_barbershop
+    env_file:
+      - ./server/.env
     build:
       context: ./server
       dockerfile: Dockerfile
