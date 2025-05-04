@@ -1,5 +1,6 @@
 services:
   server:
+    container_name: server_barbershop
     build:
       context: ./server
       dockerfile: Dockerfile
@@ -15,6 +16,7 @@ services:
     restart: unless-stopped
 
   client:
+    container_name: client_barbershop
     build:
       context: ./client
       dockerfile: Dockerfile
